@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2C36B9">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Bonificación FUNDAE</title>
+
+<!-- Tipografía moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+    background: #fafafa;
+    padding: 15px;
+    color: #222;
+    font-size: 17px;
+}
+
+/* Ajustes móviles mejorados */
+@media (max-width: 600px) {
+    body {
+        padding: 6px;
+        font-size: 18px;
+    }
+
+    .card {
+        margin: 0 0 12px 0;
+        padding: 14px;
+        border-radius: 10px;
+    }
+
+    .linea-flex {
+        margin-left: 0;
+        gap: 12px;
+    }
+
+    .input-estrecho {
+        width: 100px !important;
+        font-size: 1.2em;
+    }
+
+    .texto-dos-lineas {
+        font-size: 1em;
+        line-height: 1.2em;
+    }
+
+    button {
+        font-size: 1.4em;
+        padding: 14px;
+    }
+
+    .importe-naranja {
+        min-width: 140px;
+        font-size: 1.8em;
+        height: 48px;
+        line-height: 48px;
+    }
+}
+
+/* Tarjetas */
+.card {
+    border: 1px solid #ddd;
+    padding: 12px;
+    margin: 0 0 10px 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Inputs modernos */
+input[type="number"], input[type="text"] {
+    background: #e6ffe6;
+    border: 2px solid #009900;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    color: black;
+    padding: 8px 10px;
+    font-size: 1.05em;
+}
+
+input:focus {
+    background: #0a7a0a;
+    color: white;
+    caret-color: white;
+    outline: none;
+}
+
+/* Quitar flechas de inputs number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Inputs estrechos */
+.input-estrecho {
+    width: 80px !important;
+}
+
+/* Línea flexible */
+.linea-flex {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0;
+    margin-left: 18px;
+}
+
+/* Texto dos líneas */
+.texto-dos-lineas {
+    font-size: 0.9em;
+    line-height: 1.1em;
+}
+
+/* Cuadro naranja */
+.importe-naranja {
+    background: orange;
+    border: 3px solid red;
+    border-radius: 12px;
+    font-size: 1.6em;
+    font-weight: bold;
+    padding: 0 10px;
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+    min-width: 120px;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    box-shadow:
+        0 6px 14px rgba(0,0,0,0.20),
+        0 3px 6px rgba(0,0,0,0.12);
+    color: #2C36B9;
+}
+
+/* Texto final */
+.nota-final {
+    font-size: 0.85em;
+    margin-top: 6px;
+    margin-bottom: 0;
+}
+
+/* Botón */
+button {
+    background: linear-gradient(135deg, #2C36B9, #1666c5);
+    color: white;
+    font-size: 1.3em;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: 0.2s;
+}
+button:hover {
+    background: #155bb0;
+    transform: translateY(-2px);
+}
+
+/* Pie */
+.footer {
+    background: #2C36B9;
+    color: white;
+    text-align: center;
+    padding: 12px;
+    margin-top: 15px;
+    border-radius: 10px;
+}
+
+/* Parpadeo */
+.parpadeo {
+    animation: flash 0.4s ease-in-out 3;
+}
+@keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.1; }
+    100% { opacity: 1; }
+}
+
+/* Placeholder del campo de coste */
+::placeholder {
+    color: #777;
+    font-weight: 500;
+}
+
+#costeFormacion:focus::placeholder {
+    color: #ffff66;   /* amarillo claro que resalta sobre fondo oscuro */
+    opacity: 1;       /* asegurarse de que sea totalmente visible */
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- CABECERA -->
+<div class="card" style="text-align:center; background:#2C36B9; color:white; border:none;">
+    <h2 id="tituloApp" style="margin-bottom:5px;">Bonificación FUNDAE</h2>
+    <p style="margin-top:0; line-height:1.3em;">
+        Rellena 1 a 3 para saber cuánto puede bonificarse una empresa por formación
+    </p>
+</div>
+<!-- PUNTO 1 -->
+<div class="card">
+    <b>1. Duración del curso:</b>
+
+    <div class="linea-flex">
+        <input class="input-estrecho" id="horasBasicas" type="number" min="0" step="1"
+               onkeydown="soloEnteros(event,this)"
+               oninput="soloNaturales(this); limpiarResultados()">
+        <span class="texto-dos-lineas">Horas presenciales<br>(nivel básico)</span>
+    </div>
+
+    <div class="linea-flex">
+        <input class="input-estrecho" id="horasNoBasicas" type="number" min="0" step="1"
+               onkeydown="soloEnteros(event,this)"
+               oninput="soloNaturales(this); limpiarResultados()">
+        <span class="texto-dos-lineas">Horas presenciales<br>(nivel no básico)</span>
+    </div>
+
+    <div class="linea-flex">
+        <input class="input-estrecho" id="horasOnline" type="number" min="0" step="1"
+               onkeydown="soloEnteros(event,this)"
+               oninput="soloNaturales(this); limpiarResultados()">
+        <span class="texto-dos-lineas">Horas online<br>(plataforma e‑learning)</span>
+    </div>
+
+    <p class="nota-final">
+        <b><u>Nota</u>:</b> Los videocursos en directo (<a href="https://www.enriquegestiona.com/aula-virtual" target="_blank" tabindex="-1">Aula Virtual</a>) son <b>presenciales</b> para FUNDAE.
+    </p>
+</div>
+
+<!-- PUNTO 2 -->
+<div class="card">
+    <b>2. Número de alumnos:</b>
+
+    <div class="linea-flex" style="margin-top:8px;">
+        <input class="input-estrecho" id="alumnos" type="number" min="0" step="1"
+               onkeydown="soloEnteros(event,this)"
+               oninput="soloNaturales(this); limpiarResultados()">
+        <span class="texto-dos-lineas">Empleados de la empresa que hacen el curso</span>
+    </div>
+</div>
+
+<!-- PUNTO 3 -->
+<div class="card">
+    <b>3. Coste de formación: </b>
+
+    <div class="linea-flex" style="margin-top:8px;">
+        <input id="costeFormacion" type="text" inputmode="decimal" class="input-estrecho"
+               placeholder="€"
+               onfocus="this.value=''; limpiarResultados()"
+               oninput="soloEuros(this); limpiarResultados()"
+               onblur="formatearCoste()">
+        <span class="texto-dos-lineas">
+            Importe (sin IVA) que factura la empresa de formación
+        </span>
+    </div>
+
+    <p class="nota-final">
+        O el coste de personal si es
+        <a href="https://www.enriquegestiona.com/formación-interna" tabindex="-1">formación interna</a>.
+    </p>
+</div>
+
+<!-- BOTÓN -->
+<button onclick="calcular()">Calcular</button>
+
+<!-- PUNTO 4 -->
+<div class="card">
+    <b>4. Coste de gestión: <span id="punto4Honorarios">75,00 €</span> + IVA</b><br>
+    <p class="nota-final">Son mis honorarios por tramitar un curso en FUNDAE.</p>
+</div>
+
+<!-- PUNTO 5 -->
+<div class="card">
+    <b>Topes a la bonificación:</b>
+
+    <div class="linea-flex" style="margin-top:6px;">
+        <span style="font-size:0.8em; font-style:italic;">De 1-2</span>
+        <span style="font-size:0.9em">Máximo bonificable:</span>
+        <b><span id="maximoBonificable">---</span></b>
+    </div>
+
+    <div class="linea-flex" style="margin-top:4px;">
+        <span style="font-size:0.8em; font-style:italic;">De 3-4</span>
+	<span style="font-size:0.9em">Tope por costes:</span>
+        <b><span id="topePorCostes">---</span></b>
+    </div>
+
+    <div style="margin-top:6px; margin-bottom:0;">
+        <b style="font-size:1.3em;">A bonificar:</b>
+
+        <span id="importeBonificar" class="importe-naranja"></span>
+
+        <span style="font-size:1.4em; font-weight:600; vertical-align:middle; margin-left:6px;">€</span>
+    </div>
+
+    <p class="nota-final">
+        Siempre que a la empresa le quede ayuda económica anual suficiente. Si tiene menos le hará de tope.
+    </p>
+</div>
+
+<!-- PIE -->
+<div class="footer">
+    EnriqueGestiona, Técnico de Formación<br>
+    Enrique Cervera - <a href="tel:636817604" style="color:white;">636 817 604</a><br>
+    <a href="mailto:correo@enriquegestiona.com" style="color:white;">correo@enriquegestiona.com</a><br>
+    <a href="https://www.enriquegestiona.com" style="color:white;">www.enriquegestiona.com</a>
+</div>
+
+<!-- MODAL PERSONALIZADO -->
+<div id="modalAviso" style="
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.4);
+    z-index:9999;
+    justify-content:center;
+    align-items:center;
+">
+    <div style="
+        background:white;
+        padding:20px;
+        border-radius:12px;
+        width:85%;
+        max-width:350px;
+        text-align:center;
+        box-shadow:0 4px 12px rgba(0,0,0,0.25);
+        font-family:Inter, sans-serif;
+    ">
+        <div id="modalTitulo" style="
+            font-size:1.3em;
+            font-weight:700;
+            margin-bottom:10px;
+            color:#2C36B9;
+        "></div>
+
+        <div id="modalTexto" style="
+            font-size:1em;
+            margin-bottom:18px;
+            color:#333;
+        "></div>
+
+        <button onclick="cerrarAviso()" style="
+            background:#2C36B9;
+            color:white;
+            padding:10px 25px;
+            border:none;
+            border-radius:8px;
+            font-size:1.1em;
+            cursor:pointer;
+        ">Aceptar</button>
+    </div>
+</div>
+
+<!-- MODAL HONORARIOS -->
+<div id="modalHonorarios" style="
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); z-index:99999; justify-content:center; align-items:center;
+">
+    <div style="
+        background:white; padding:20px; border-radius:12px; width:85%; max-width:350px;
+        text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.25);
+    ">
+        <h3 style="margin-top:0; color:#2C36B9;">Actualizar honorarios:</h3>
+
+        <input id="nuevoHonorario" type="number" min="0" step="1"
+               style="padding:8px; width:120px; text-align:center; font-size:1.2em;">
+
+        <div style="margin-top:15px;">
+            <button onclick="guardarHonorarios()" style="
+                background:#2C36B9; color:white; padding:10px 25px; border:none;
+                border-radius:8px; font-size:1.1em; cursor:pointer;
+            ">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+let inputParaFoco = null;
+let valorPrevioInput = "";
+let idInputPrevio = "";
+
+/* HONORARIOS CENTRALIZADOS */
+let HONORARIOS_GESTION = parseFloat(localStorage.getItem("honorariosGestion")) || 75;
+
+/* Formato europeo manual */
+function formatoEuro(num) {
+    const valor = (Number(num) || 0).toFixed(2);
+    let [ent, dec] = valor.split(".");
+    ent = ent.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return ent + "," + dec;
+}
+
+/* Convierte texto tipo "1.500,25" a número */
+function parseEuroToNumber(str) {
+    if (!str) return 0;
+    let limpio = String(str).trim();
+    limpio = limpio.replace(/\./g, "");
+    limpio = limpio.replace(",", ".");
+    return parseFloat(limpio) || 0;
+}
+
+/* Limpia resultados */
+function limpiarResultados() {
+    document.getElementById("maximoBonificable").innerText = "---";
+    document.getElementById("topePorCostes").innerText = "---";
+    document.getElementById("importeBonificar").innerText = "";
+}
+
+/* Solo números naturales */
+function soloNaturales(input) {
+    input.value = input.value.replace(/[^\d]/g, "");
+}
+
+function soloEnteros(event, input) {
+    const teclasPermitidas = [
+        "Backspace",
+        "Delete",
+        "ArrowLeft",
+        "ArrowRight",
+        "Tab"
+    ];
+    if (teclasPermitidas.includes(event.key)) return;
+    if (!/^[0-9]$/.test(event.key)) {
+        valorPrevioInput = input.value;
+        idInputPrevio = input.id;
+        event.preventDefault();
+        mostrarAviso(
+            "Solo números sin decimales",
+            "",
+            input.id
+        );
+    }
+}
+
+/* Solo euros */
+function soloEuros(input) {
+    let valor = input.value;
+
+    valor = valor.replace(/\./g, ",");
+    valor = valor.replace(/[^0-9,]/g, "");
+
+    const partes = valor.split(",");
+    if (partes.length > 2) valor = partes[0] + "," + partes[1];
+    if (partes[1] && partes[1].length > 2)
+        valor = partes[0] + "," + partes[1].substring(0, 2);
+
+    input.value = valor;
+}
+
+/* Formatea el coste al salir del input */
+function formatearCoste() {
+    const input = document.getElementById("costeFormacion");
+    const numero = parseEuroToNumber(input.value);
+    input.value = numero ? formatoEuro(numero) : "";
+}
+
+/* Modal personalizado */
+function mostrarAviso(titulo, texto, idFoco = null) {
+    document.getElementById("modalTitulo").innerText = titulo;
+    document.getElementById("modalTexto").innerText = texto;
+    document.getElementById("modalAviso").style.display = "flex";
+
+    inputParaFoco = idFoco;
+}
+
+function cerrarAviso() {
+    document.getElementById("modalAviso").style.display = "none";
+    if (inputParaFoco) {
+        const campo = document.getElementById(inputParaFoco);
+        if (campo) {
+            if (campo.id === idInputPrevio) {
+                campo.value = valorPrevioInput;
+            }
+            campo.focus();
+        }
+    }
+    inputParaFoco = null;
+}
+
+/* Foco automático */
+window.onload = () => {
+    window.scrollTo(0, 0);
+    document.querySelector("#punto4Honorarios").innerText =
+        formatoEuro(HONORARIOS_GESTION) + " €";
+    setTimeout(() => {
+        document.getElementById("horasNoBasicas").focus();
+    }, 200);
+};
+
+/* SISTEMA HONORARIOS: 5 CLICS EN EL TÍTULO */
+let contadorTitulo = 0;
+let tiempoPrimerClickTitulo = null;
+
+document.getElementById("tituloApp").addEventListener("click", () => {
+    const ahora = Date.now();
+
+    if (!tiempoPrimerClickTitulo) {
+        tiempoPrimerClickTitulo = ahora;
+    }
+
+    contadorTitulo++;
+
+    if (contadorTitulo >= 5 && (ahora - tiempoPrimerClickTitulo) < 3000) {
+        abrirPanelHonorarios();
+        contadorTitulo = 0;
+        tiempoPrimerClickTitulo = null;
+        return;
+    }
+
+    if ((ahora - tiempoPrimerClickTitulo) >= 3000) {
+        contadorTitulo = 0;
+        tiempoPrimerClickTitulo = null;
+    }
+});
+
+/* MODAL HONORARIOS */
+function abrirPanelHonorarios() {
+    document.getElementById("nuevoHonorario").value = HONORARIOS_GESTION;
+    document.getElementById("modalHonorarios").style.display = "flex";
+}
+
+function guardarHonorarios() {
+    const nuevo = parseFloat(document.getElementById("nuevoHonorario").value);
+    if (!nuevo || nuevo <= 0) return;
+
+    HONORARIOS_GESTION = nuevo;
+    localStorage.setItem("honorariosGestion", nuevo);
+
+    document.getElementById("modalHonorarios").style.display = "none";
+
+    document.querySelector("#punto4Honorarios").innerText = formatoEuro(nuevo) + " €";
+}
+
+/* CÁLCULO */
+function calcular() {
+    const horasBasicas = parseFloat(document.getElementById("horasBasicas").value) || 0;
+    const horasNoBasicas = parseFloat(document.getElementById("horasNoBasicas").value) || 0;
+    const horasOnline = parseFloat(document.getElementById("horasOnline").value) || 0;
+    const alumnos = parseFloat(document.getElementById("alumnos").value) || 0;
+    const costeFormacion = parseEuroToNumber(document.getElementById("costeFormacion").value);
+
+    /* VALIDACIONES */
+
+    if (horasBasicas === 0 && horasNoBasicas === 0 && horasOnline === 0) {
+        mostrarAviso("Falta la duración:", "Introduce la duración del curso", "horasNoBasicas");
+        return;
+    }
+
+    if (horasBasicas > 0 && horasNoBasicas > 0) {
+        mostrarAviso("Duración incorrecta:", "No puede haber horas presenciales en dos niveles a la vez", "horasBasicas");
+        return;
+    }
+
+    if (horasBasicas === 1 || horasNoBasicas === 1 || horasOnline === 1) {
+        mostrarAviso("Duración no válida:", "La duración mínima permitida es de 2 horas", "horasNoBasicas");
+        return;
+    }
+
+    const hayPresenciales = (horasBasicas + horasNoBasicas) > 0;
+
+    if (!hayPresenciales && alumnos > 80) {
+        mostrarAviso("Demasiados alumnos:", "Los cursos online no pueden superar los 80 alumnos", "alumnos");
+        return;
+    }
+
+    if (hayPresenciales && alumnos > 30) {
+        mostrarAviso("Demasiados alumnos:", "Los cursos con horas presenciales no pueden superar los 30 alumnos", "alumnos");
+        return;
+    }
+
+    if (alumnos === 0) {
+        mostrarAviso("Faltan los alumnos:", "Introduce el número de alumnos", "alumnos");
+        return;
+    }
+
+    if (!costeFormacion || costeFormacion === 0) {
+        mostrarAviso("Falta el coste:", "Introduce el coste de formación", "costeFormacion");
+        return;
+    }
+
+    /* CÁLCULO NORMAL */
+
+    let maximoBonificable = 0;
+
+    if ((horasBasicas + horasNoBasicas) > (horasOnline / 4)) {
+        maximoBonificable =
+            (horasBasicas * 9 +
+             horasNoBasicas * 13 +
+             horasOnline * 7.5) * alumnos;
+    } else {
+        maximoBonificable =
+            (horasBasicas + horasNoBasicas + horasOnline) * 7.5 * alumnos;
+    }
+
+    const gestion1 = HONORARIOS_GESTION;
+    const gestion2 = (costeFormacion + HONORARIOS_GESTION) / 10;
+    const gestionFinal = Math.min(gestion1, gestion2);
+
+    const topePorCostes = costeFormacion + gestionFinal;
+    const importeFinal = Math.min(maximoBonificable, topePorCostes);
+
+    document.getElementById("maximoBonificable").innerText =
+        formatoEuro(maximoBonificable) + " €";
+
+    document.getElementById("topePorCostes").innerText =
+        formatoEuro(topePorCostes) + " €";
+
+    const cuadro = document.getElementById("importeBonificar");
+    cuadro.innerText = formatoEuro(importeFinal);
+
+    cuadro.classList.remove("parpadeo");
+    void cuadro.offsetWidth;
+    cuadro.classList.add("parpadeo");
+
+    /* SCROLL AUTOMÁTICO */
+    document.getElementById("importeBonificar").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+}
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+</body>
+</html>

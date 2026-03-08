@@ -1,4 +1,4 @@
-const CACHE_NAME = "fundae-calculadora-v1";
+const CACHE_NAME = "fundae-calculadora-v2";
 
 const urlsToCache = [
   "./",

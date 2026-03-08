@@ -642,5 +642,19 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+<script>
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(() => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+        }
+    }, 3000);
+});
+</script>
+
 </body>
+
 </html>

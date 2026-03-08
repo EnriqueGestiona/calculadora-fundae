@@ -1,6 +1,6 @@
 {
   "name": "Bonificación FUNDAE",
-  "short_name": "Bonificación FUNDAE",
+  "short_name": "Bonif. FUNDAE",
   "description": "Calculadora de bonificación FUNDAE",
   "start_url": "./index.html",
   "display": "standalone",
@@ -21,3 +21,4 @@
   ]
 
 }
+

@@ -204,6 +204,12 @@ button:hover {
 
 <body>
 
+<div id="instalarLink" style="display:none; text-align:center; margin-bottom:10px;">
+<a href="#" onclick="instalarPWA()" style="font-weight:600; color:#2C36B9;">
+📱 Instalar esta calculadora en tu móvil
+</a>
+</div>
+
 <!-- CABECERA -->
 <div class="card" style="text-align:center; background:#2C36B9; color:white; border:none;">
     <h2 id="tituloApp" style="margin-bottom:5px;">Bonificación FUNDAE</h2>
@@ -655,7 +661,28 @@ window.addEventListener("beforeinstallprompt", (e) => {
 });
 </script>
 
+<script>
+let deferredPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    const link = document.getElementById("instalarLink");
+    if (link) link.style.display = "block";
+});
+function instalarPWA() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+        const link = document.getElementById("instalarLink");
+        if (link) link.style.display = "none";
+    });
+}
+</script>
+
 </body>
 
 </html>
+
 

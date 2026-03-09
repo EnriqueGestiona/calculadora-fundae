@@ -1,8 +1,10 @@
 {
+  "id": "https://calculadora.enriquegestiona.com/",
   "name": "Bonificación FUNDAE",
   "short_name": "Bonif. FUNDAE",
   "description": "Calculadora de bonificación FUNDAE",
-  "start_url": "./index.html",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "display_override": ["standalone"],
   "background_color": "#2C36B9",
@@ -20,7 +22,4 @@
       "type": "image/png"
     }
   ]
-
 }
-
-

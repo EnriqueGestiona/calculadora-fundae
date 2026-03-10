@@ -23,9 +23,9 @@ body {
 /* Banner estilo Android/Chrome con fondo gris suave */
 #barraInstalar {
     display:none;
-    background:#f2f2f2;
+    background:#e6e6e6; /* gris más oscuro */
     padding:10px 14px;
-    border-bottom:1px solid #ddd;
+    border-bottom:1px solid #ccc;
     box-shadow:0 2px 6px rgba(0,0,0,0.15);
     position:sticky;
     top:0;
@@ -36,14 +36,12 @@ body {
     gap:12px;
 }
 
-/* Icono */
 #barraInstalar img {
     width:40px;
     height:40px;
     border-radius:8px;
 }
 
-/* Texto */
 #barraInstalar .texto {
     display:flex;
     flex-direction:column;
@@ -52,23 +50,22 @@ body {
 
 #barraInstalar .texto .titulo {
     font-weight:600;
-    font-size:15px;
+    font-size:17px;  /* más grande */
     color:#000;
 }
 
 #barraInstalar .texto .dominio {
-    font-size:13px;
-    color:#666;
+    font-size:14px;  /* más grande */
+    color:#555;      /* más visible */
 }
 
-/* Botón */
 #barraInstalar button {
     background:#2C36B9;
     color:white;
     border:none;
     padding:6px 14px;
     border-radius:6px;
-    font-size:14px;
+    font-size:15px;
     cursor:pointer;
 }
 

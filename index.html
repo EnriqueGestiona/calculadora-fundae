@@ -20,27 +20,55 @@ body {
     font-size: 17px;
 }
 
-/* Barra superior instalación */
+/* Banner estilo Android/Chrome con fondo gris suave */
 #barraInstalar {
     display:none;
-    background:white;
-    border-bottom:2px solid #2C36B9;
-    padding:10px;
-    text-align:center;
-    font-weight:600;
-    color:#2C36B9;
+    background:#f2f2f2;
+    padding:10px 14px;
+    border-bottom:1px solid #ddd;
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
     position:sticky;
     top:0;
     z-index:9999;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
 }
+
+/* Icono */
+#barraInstalar img {
+    width:40px;
+    height:40px;
+    border-radius:8px;
+}
+
+/* Texto */
+#barraInstalar .texto {
+    display:flex;
+    flex-direction:column;
+    line-height:1.1em;
+}
+
+#barraInstalar .texto .titulo {
+    font-weight:600;
+    font-size:15px;
+    color:#000;
+}
+
+#barraInstalar .texto .dominio {
+    font-size:13px;
+    color:#666;
+}
+
+/* Botón */
 #barraInstalar button {
     background:#2C36B9;
     color:white;
     border:none;
     padding:6px 14px;
     border-radius:6px;
-    font-size:1em;
-    margin-left:10px;
+    font-size:14px;
     cursor:pointer;
 }
 
@@ -227,9 +255,13 @@ button:hover {
 
 <body>
 
-<!-- NUEVA BARRA SUPERIOR -->
+<!-- BANNER DE INSTALACIÓN -->
 <div id="barraInstalar">
-    📱 Instalar esta app
+    <img src="icon-192.png" alt="icono">
+    <div class="texto">
+        <span class="titulo">Instalar App</span>
+        <span class="dominio">enriquegestiona.com</span>
+    </div>
     <button onclick="instalarPWA()">Instalar</button>
 </div>
 <!-- CABECERA -->
@@ -418,7 +450,7 @@ button:hover {
     </div>
 </div>
 
-<!-- JAVASCRIPT ORIGINAL (sin tocar nada) -->
+<!-- JAVASCRIPT ORIGINAL -->
 <script>
 let inputParaFoco = null;
 let valorPrevioInput = "";
@@ -664,6 +696,7 @@ function calcular() {
     });
 }
 </script>
+</script>
 
 <!-- SERVICE WORKER -->
 <script>
@@ -672,21 +705,7 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
-<!-- NUEVO SISTEMA DE INSTALACIÓN (único bloque correcto) -->
-<script>
-let deferredPrompt = null;
-
-/* Detectar si ya está instalada */
-function pwaInstalada() {
-    return window.match
-<!-- SERVICE WORKER -->
-<script>
-if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js");
-}
-</script>
-
-<!-- NUEVO SISTEMA DE INSTALACIÓN (único bloque correcto) -->
+<!-- SISTEMA DE INSTALACIÓN PWA -->
 <script>
 let deferredPrompt = null;
 
@@ -702,7 +721,7 @@ window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
 
-    document.getElementById("barraInstalar").style.display = "block";
+    document.getElementById("barraInstalar").style.display = "flex";
 });
 
 function instalarPWA() {
@@ -719,6 +738,45 @@ function instalarPWA() {
 if (pwaInstalada()) {
     document.getElementById("barraInstalar").style.display = "none";
 }
+</script>
+
+<!-- SWIPE PARA CERRAR EL BANNER -->
+<script>
+(function() {
+    const barra = document.getElementById("barraInstalar");
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+
+    barra.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+        dragging = true;
+        barra.style.transition = "none";
+    });
+
+    barra.addEventListener("touchmove", (e) => {
+        if (!dragging) return;
+        currentX = e.touches[0].clientX - startX;
+        barra.style.transform = `translateX(${currentX}px)`;
+    });
+
+    barra.addEventListener("touchend", () => {
+        dragging = false;
+
+        if (Math.abs(currentX) > 60) {
+            barra.style.transition = "0.2s";
+            barra.style.transform = `translateX(${currentX > 0 ? 300 : -300}px)`;
+            setTimeout(() => {
+                barra.style.display = "none";
+            }, 200);
+        } else {
+            barra.style.transition = "0.2s";
+            barra.style.transform = "translateX(0)";
+        }
+
+        currentX = 0;
+    });
+})();
 </script>
 
 </body>

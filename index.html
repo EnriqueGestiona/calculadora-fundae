@@ -20,6 +20,30 @@ body {
     font-size: 17px;
 }
 
+/* Barra superior instalación */
+#barraInstalar {
+    display:none;
+    background:white;
+    border-bottom:2px solid #2C36B9;
+    padding:10px;
+    text-align:center;
+    font-weight:600;
+    color:#2C36B9;
+    position:sticky;
+    top:0;
+    z-index:9999;
+}
+#barraInstalar button {
+    background:#2C36B9;
+    color:white;
+    border:none;
+    padding:6px 14px;
+    border-radius:6px;
+    font-size:1em;
+    margin-left:10px;
+    cursor:pointer;
+}
+
 /* Ajustes móviles mejorados */
 @media (max-width: 600px) {
     body {
@@ -195,21 +219,19 @@ button:hover {
 }
 
 #costeFormacion:focus::placeholder {
-    color: #ffff66;   /* amarillo claro que resalta sobre fondo oscuro */
-    opacity: 1;       /* asegurarse de que sea totalmente visible */
+    color: #ffff66;
+    opacity: 1;
 }
-
 </style>
 </head>
 
 <body>
 
-<div id="instalarLink" style="display:none; text-align:center; margin-bottom:10px;">
-<a href="#" onclick="instalarPWA()" style="font-weight:600; color:#2C36B9;">
-📱 Instalar esta calculadora en tu móvil
-</a>
+<!-- NUEVA BARRA SUPERIOR -->
+<div id="barraInstalar">
+    📱 Instalar esta app
+    <button onclick="instalarPWA()">Instalar</button>
 </div>
-
 <!-- CABECERA -->
 <div class="card" style="text-align:center; background:#2C36B9; color:white; border:none;">
     <h2 id="tituloApp" style="margin-bottom:5px;">Bonificación FUNDAE</h2>
@@ -217,6 +239,7 @@ button:hover {
         Rellena 1 a 3 para saber cuánto puede bonificarse una empresa por formación si le tramitara un curso en FUNDAE
     </p>
 </div>
+
 <!-- PUNTO 1 -->
 <div class="card">
     <b>1. Duración del curso:</b>
@@ -301,7 +324,7 @@ button:hover {
 
     <div class="linea-flex" style="margin-top:4px;">
         <span style="font-size:0.8em; font-style:italic;">De 3-4</span>
-	<span style="font-size:0.9em">Tope por costes:</span>
+        <span style="font-size:0.9em">Tope por costes:</span>
         <b><span id="topePorCostes">---</span></b>
     </div>
 
@@ -395,7 +418,7 @@ button:hover {
     </div>
 </div>
 
-<!-- JAVASCRIPT -->
+<!-- JAVASCRIPT ORIGINAL (sin tocar nada) -->
 <script>
 let inputParaFoco = null;
 let valorPrevioInput = "";
@@ -642,47 +665,61 @@ function calcular() {
 }
 </script>
 
+<!-- SERVICE WORKER -->
 <script>
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js");
 }
 </script>
 
-<script>
-let deferredPrompt;
-window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    setTimeout(() => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-        }
-    }, 3000);
-});
-</script>
-
+<!-- NUEVO SISTEMA DE INSTALACIÓN (único bloque correcto) -->
 <script>
 let deferredPrompt = null;
+
+/* Detectar si ya está instalada */
+function pwaInstalada() {
+    return window.match
+<!-- SERVICE WORKER -->
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+}
+</script>
+
+<!-- NUEVO SISTEMA DE INSTALACIÓN (único bloque correcto) -->
+<script>
+let deferredPrompt = null;
+
+/* Detectar si ya está instalada */
+function pwaInstalada() {
+    return window.matchMedia("(display-mode: standalone)").matches ||
+           window.navigator.standalone === true;
+}
+
 window.addEventListener("beforeinstallprompt", (e) => {
+    if (pwaInstalada()) return;
+
     e.preventDefault();
     deferredPrompt = e;
 
-    const link = document.getElementById("instalarLink");
-    if (link) link.style.display = "block";
+    document.getElementById("barraInstalar").style.display = "block";
 });
+
 function instalarPWA() {
     if (!deferredPrompt) return;
+
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then(() => {
         deferredPrompt = null;
-        const link = document.getElementById("instalarLink");
-        if (link) link.style.display = "none";
+        document.getElementById("barraInstalar").style.display = "none";
     });
+}
+
+/* Si ya está instalada, ocultar barra */
+if (pwaInstalada()) {
+    document.getElementById("barraInstalar").style.display = "none";
 }
 </script>
 
 </body>
-
 </html>
-
-

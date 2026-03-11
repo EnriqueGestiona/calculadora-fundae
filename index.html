@@ -781,7 +781,7 @@ setTimeout(() => {
     barra.style.display = "flex";
     barra.classList.add("barra-animada"); // animación de entrada
 
-    // Autocerrar 3 segundos después
+    // Autocerrar 5 segundos después
     setTimeout(() => {
         if (window.getComputedStyle(barra).display !== "none") {
             barra.classList.remove("barra-animada");
@@ -792,9 +792,9 @@ setTimeout(() => {
                 barra.classList.remove("barra-desaparece");
             }, 400); // duración del fade-out
         }
-    }, 3000);
+    }, 5000);
 
-}, 8000);
+}, 3000);
 
 });
 
@@ -851,4 +851,5 @@ function instalarPWA() {
 
 </body>
 </html>
+
 

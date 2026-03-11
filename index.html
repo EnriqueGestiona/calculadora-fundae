@@ -707,7 +707,7 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
-<!-- SISTEMA DE INSTALACIÓN PWA (MEJORADO) -->
+<!-- SISTEMA DE INSTALACIÓN PWA (CORREGIDO) -->
 <script>
 let deferredPrompt = null;
 
@@ -717,7 +717,7 @@ function pwaInstalada() {
            window.navigator.standalone === true;
 }
 
-/* Detectar si es móvil (Android/iOS) */
+/* Detectar si es móvil */
 function esMovil() {
     return navigator.maxTouchPoints > 1 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
@@ -735,7 +735,7 @@ window.addEventListener("beforeinstallprompt", (e) => {
     if (!esMovil()) {
         setTimeout(() => {
             barra.style.display = "none";
-        }, 5000); // 5 segundos
+        }, 5000);
     }
 });
 
@@ -753,6 +753,18 @@ function instalarPWA() {
 if (pwaInstalada()) {
     document.getElementById("barraInstalar").style.display = "none";
 }
+
+/* NUEVO: autocerrar si el banner aparece sin beforeinstallprompt (caso escritorio) */
+window.addEventListener("load", () => {
+    const barra = document.getElementById("barraInstalar");
+
+    // Si la barra está visible y NO es móvil → autocerrar
+    if (barra.style.display !== "none" && !esMovil() && !pwaInstalada()) {
+        setTimeout(() => {
+            barra.style.display = "none";
+        }, 5000);
+    }
+});
 </script>
 
 <!-- SWIPE PARA CERRAR EL BANNER -->

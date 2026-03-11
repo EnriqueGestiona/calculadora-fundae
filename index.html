@@ -57,7 +57,7 @@ body {
     color:#000;
 }
 
-/* Nombre App más grande y más visible */
+/* Dominio más grande y más visible */
 #barraInstalar .texto .nombreapp {
     font-size:17px;   /* antes 14px */
     color:#444;
@@ -707,14 +707,19 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
-<!-- SISTEMA DE INSTALACIÓN PWA -->
+<!-- SISTEMA DE INSTALACIÓN PWA (MEJORADO) -->
 <script>
 let deferredPrompt = null;
 
-/* Detectar si ya está instalada */
+/* Detectar si la PWA está instalada */
 function pwaInstalada() {
     return window.matchMedia("(display-mode: standalone)").matches ||
            window.navigator.standalone === true;
+}
+
+/* Detectar si es móvil (Android/iOS) */
+function esMovil() {
+    return navigator.maxTouchPoints > 1 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
 window.addEventListener("beforeinstallprompt", (e) => {
@@ -723,7 +728,15 @@ window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     deferredPrompt = e;
 
-    document.getElementById("barraInstalar").style.display = "flex";
+    const barra = document.getElementById("barraInstalar");
+    barra.style.display = "flex";
+
+    /* AUTOCIERRE SOLO EN ESCRITORIO */
+    if (!esMovil()) {
+        setTimeout(() => {
+            barra.style.display = "none";
+        }, 5000); // 5 segundos
+    }
 });
 
 function instalarPWA() {
@@ -783,4 +796,3 @@ if (pwaInstalada()) {
 
 </body>
 </html>
-

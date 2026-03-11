@@ -32,13 +32,30 @@ body {
     top:10px;
     margin:0 10px;
     z-index:9999;
-
-    /* ELIMINAR ESTA LÍNEA:
-    display:flex;
-    */
     align-items:center;
     gap:14px;
 }
+
+/* Animación suave al aparecer */
+@keyframes fadeInBanner {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Animación suave al desaparecer */
+@keyframes fadeOutBanner {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-10px); }
+}
+
+.barra-animada {
+    animation: fadeInBanner 0.5s ease-out;
+}
+
+.barra-desaparece {
+    animation: fadeOutBanner 0.4s ease-in forwards;
+}
+
 
 @media (min-width: 601px) {
     #barraInstalar {
@@ -761,18 +778,26 @@ window.addEventListener("load", () => {
         return;
     }
 
-    /* Mostrar a los 3 segundos */
+// Mostrar a los 3 segundos
+setTimeout(() => {
+    barra.style.display = "flex";
+    barra.classList.add("barra-animada"); // animación de entrada
+
+    // Autocerrar 3 segundos después
     setTimeout(() => {
-        barra.style.display = "flex";
+        if (window.getComputedStyle(barra).display !== "none") {
+            barra.classList.remove("barra-animada");
+            barra.classList.add("barra-desaparece"); // animación de salida
 
-        /* Autocerrar 3 segundos después */
-        setTimeout(() => {
-            if (window.getComputedStyle(barra).display !== "none") {
+            setTimeout(() => {
                 barra.style.display = "none";
-            }
-        }, 3000);
-
+                barra.classList.remove("barra-desaparece");
+            }, 400); // duración del fade-out
+        }
     }, 3000);
+
+}, 3000);
+
 });
 
 /* Botón instalar */

@@ -19,7 +19,6 @@
   --accent: #3d8bff;
   --green-bg: #edfdf4;
   --green-border: #34c77b;
-  --green-focus: #34c77b;
   --result-bg: #FFA500;
   --result-border: #FFA500;
   --result-value: #2C36B9;
@@ -48,7 +47,6 @@ body {
 
 img { max-width: 100%; height: auto; }
 button, input { touch-action: manipulation; }
-button:focus { outline: none; }
 
 /* ── BANNER INSTALACIÓN ── */
 #barraInstalar,
@@ -266,8 +264,8 @@ input[type="text"] {
 }
 
 input:focus {
-  background: var(--green-focus);
-  border-color: var(--green-focus);
+  background: var(--green-border);
+  border-color: var(--green-border);
   color: #fff;
   caret-color: #fff;
   outline: none;
@@ -373,7 +371,7 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .btn-calcular:hover  { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,31,94,0.36); }
 .btn-calcular:active { transform: translateY(0); opacity: 0.9; }
-.btn-calcular:focus  { outline: 3px solid var(--result-border); outline-offset: 2px; }
+.btn-calcular:focus  { outline: 3px solid var(--green-border); outline-offset: 0; }
 
 /* ── CARD GESTIÓN (info) ── */
 .card-info {
@@ -733,7 +731,7 @@ input[type=number] { -moz-appearance: textfield; }
     <span class="footer-name">EnriqueGestiona · Técnico de Formación</span>
     Enrique Cervera ·
     <a href="tel:636817604" tabindex="-1">636 817 604</a><br>
-    <a href="/cdn-cgi/l/email-protection#91f2fee3e3f4fed1f4ffe3f8e0e4f4f6f4e2e5f8fefff0bff2fefc" tabindex="-1"><span class="__cf_email__" data-cfemail="e7848895958288a78289958e969282808294938e888986c984888a">[email&#160;protected]</span></a><br>
+    <a href="mailto:correo@enriquegestiona.com" tabindex="-1">correo@enriquegestiona.com</a><br>
     <a href="https://www.enriquegestiona.com" tabindex="-1">www.enriquegestiona.com</a>
   </div>
 
@@ -842,7 +840,7 @@ function calcular() {
   if (horasPresenciales === 1 || horasOnline === 1) {
     mostrarAviso("Duración no válida:", "La duración mínima permitida es de 2 horas", "horasPresenciales"); return;
   }
-  const hayPresenciales = (horasBasicas + horasNoBasicas) > 0;
+  const hayPresenciales = horasPresenciales > 0;
   if (!hayPresenciales && alumnos > 80) {
     mostrarAviso("Demasiados alumnos:", "Los cursos online no pueden superar los 80 alumnos", "alumnos"); return;
   }

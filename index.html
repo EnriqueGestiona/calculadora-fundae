@@ -48,6 +48,7 @@ body {
 
 img { max-width: 100%; height: auto; }
 button, input { touch-action: manipulation; }
+button:focus { outline: none; }
 
 /* ── BANNER INSTALACIÓN ── */
 #barraInstalar,
@@ -280,7 +281,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 input[type=number] { -moz-appearance: textfield; }
 
 .field-desc {
-  font-size: 16px;
+  font-size: 17px;
   color: var(--text-muted);
   line-height: 1.35;
 }
@@ -321,7 +322,7 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .toggle-nivel input:checked + .toggle-track .toggle-thumb { transform: translateX(-18px); }
 .toggle-label {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--text);
 }
@@ -372,6 +373,7 @@ input[type=number] { -moz-appearance: textfield; }
 }
 .btn-calcular:hover  { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,31,94,0.36); }
 .btn-calcular:active { transform: translateY(0); opacity: 0.9; }
+.btn-calcular:focus  { outline: 3px solid var(--result-border); outline-offset: 2px; }
 
 /* ── CARD GESTIÓN (info) ── */
 .card-info {
@@ -448,7 +450,7 @@ input[type=number] { -moz-appearance: textfield; }
 }
 
 .result-label {
-  font-size: 27px;
+  font-size: 24px;
   font-weight: 700;
   color: var(--text);
   flex-shrink: 0;

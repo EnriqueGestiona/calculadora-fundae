@@ -578,13 +578,19 @@ input[type=number] { -moz-appearance: textfield; }
 <script>
   // Evento: instalación de la PWA
   window.addEventListener('appinstalled', () => {
-    umami.track('pwa_instalada');
+    if (typeof umami !== 'undefined') {
+      umami.track('pwa_instalada');
+    }
   });
 
   // Evento: abre la app desde el icono (ya instalada)
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    umami.track('pwa_abierta_desde_icono');
-  }
+  window.addEventListener('load', () => {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      if (typeof umami !== 'undefined') {
+        umami.track('pwa_abierta_desde_icono');
+      }
+    }
+  });
 </script>
 </head>
 <body>

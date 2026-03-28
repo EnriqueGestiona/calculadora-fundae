@@ -629,8 +629,9 @@ input[type=number] { -moz-appearance: textfield; }
     </div>
 
     <div class="field-row presencial-row">
-      <input class="input-estrecho" id="horasPresenciales" type="number" min="0" step="1"
+      <input class="input-estrecho" id="horasPresenciales" type="text" inputmode="numeric"
              tabindex="1"
+             onfocus="this.setSelectionRange(this.value.length,this.value.length)"
              onkeydown="soloEnteros(event,this)"
              oninput="soloNaturales(this); limpiarResultados()">
       <div class="presencial-desc">
@@ -648,8 +649,9 @@ input[type=number] { -moz-appearance: textfield; }
     <div class="separador-campos"></div>
 
     <div class="field-row">
-      <input class="input-estrecho" id="horasOnline" type="number" min="0" step="1"
+      <input class="input-estrecho" id="horasOnline" type="text" inputmode="numeric"
              tabindex="2"
+             onfocus="this.setSelectionRange(this.value.length,this.value.length)"
              onkeydown="soloEnteros(event,this)"
              oninput="soloNaturales(this); limpiarResultados()">
       <span class="field-desc">Horas online<br><strong>de plataforma e‑learning</strong></span>
@@ -668,8 +670,9 @@ input[type=number] { -moz-appearance: textfield; }
     </div>
 
     <div class="field-row">
-      <input class="input-estrecho" id="alumnos" type="number" min="0" step="1"
+      <input class="input-estrecho" id="alumnos" type="text" inputmode="numeric"
              tabindex="3"
+             onfocus="this.setSelectionRange(this.value.length,this.value.length)"
              onkeydown="soloEnteros(event,this)"
              oninput="soloNaturales(this); limpiarResultados()">
       <span class="field-desc">Empleados de la empresa que hacen el curso</span>
@@ -686,10 +689,7 @@ input[type=number] { -moz-appearance: textfield; }
     <div class="field-row" style="grid-template-columns: 115px 1fr; margin-bottom: 0;">
       <input id="costeFormacion" type="text" inputmode="decimal"
              placeholder="€" tabindex="4"
-             enterkeyhint="next"
-             onfocus="this.value=''; limpiarResultados()"
-             oninput="limpiarResultados()"
-             onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('btnCalcular').focus();}">
+             enterkeyhint="next">
       <span class="field-desc">Importe (sin IVA) que factura la empresa de formación</span>
     </div>
 
@@ -765,7 +765,7 @@ input[type=number] { -moz-appearance: textfield; }
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 const COSTE_GESTION = 75;
 
 function formatoEuro(num) {
@@ -775,22 +775,150 @@ function formatoEuro(num) {
   return ent + "," + dec;
 }
 
-function parseEuroToNumber(str) {
-  if (!str) return 0;
-  const s = String(str).trim();
-  // Formato euro ya formateado: punto de miles y/o coma decimal (ej: 1.234,56 o 521,03)
-  if (/,/.test(s) || /\d\.\d{3}/.test(s)) {
-    return parseFloat(s.replace(/\./g, "").replace(",", ".")) || 0;
-  }
-  // Formato con punto decimal anglosajón (ej: 521.03)
-  return parseFloat(s) || 0;
-}
+// ── COSTE FORMACIÓN ──────────────────────────────────────────────
+// Estrategia: guardamos el valor "crudo" (sin puntos de miles) en una
+// variable interna y solo usamos el input formateado para mostrar.
+// Así borrar/editar nunca confunde puntos de miles con decimales.
 
-function formatearCoste() {
-  const input  = document.getElementById("costeFormacion");
-  const numero = parseEuroToNumber(input.value);
-  input.value  = numero ? formatoEuro(numero) : "";
-}
+(function () {
+  // valor interno: solo dígitos y como máximo una coma con hasta 2 decimales
+  // ej: "1500", "1500,", "1500,0", "1500,05"
+  let valorCrudo = "";
+
+
+  // Convierte posición en el string formateado a posición en valorCrudo
+  // "1.234,56" pos 3 (el '3') → valorCrudo "1234,56" pos 2
+  function posFormateadaACruda(posFmt) {
+    const fmt = formatoDesdeValorCrudo();
+    let posCruda = 0;
+    for (let i = 0; i < posFmt && i < fmt.length; i++) {
+      if (fmt[i] !== '.') posCruda++; // el punto de miles no existe en crudo
+    }
+    return posCruda;
+  }
+
+  // Convierte posición en valorCrudo a posición en el string formateado
+  function posCrudaAFormateada(posCruda) {
+    const fmt = formatoDesdeValorCrudo();
+    let cuenta = 0;
+    for (let i = 0; i < fmt.length; i++) {
+      if (fmt[i] !== '.') cuenta++;
+      if (cuenta === posCruda) return i + 1;
+    }
+    return fmt.length;
+  }
+
+  function formatoDesdeValorCrudo() {
+    const partes = valorCrudo.split(',');
+    const entero = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return partes.length === 1 ? entero : entero + ',' + partes[1];
+  }
+
+  function aplicarFormato(input, posCrudaDeseada) {
+    input.value = formatoDesdeValorCrudo();
+    if (posCrudaDeseada !== undefined) {
+      const posFmt = posCrudaAFormateada(posCrudaDeseada);
+      input.setSelectionRange(posFmt, posFmt);
+    } else {
+      const len = input.value.length;
+      input.setSelectionRange(len, len);
+    }
+  }
+
+
+  // Capturamos la posición del cursor ANTES de que el navegador modifique el input
+  let cursorAntes = 0;
+
+  function manejarKeydown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('btnCalcular').focus();
+      return;
+    }
+    // Guardar posición justo antes del cambio
+    cursorAntes = e.target.selectionStart;
+  }
+
+  function manejarInput(e) {
+    const input  = e.target;
+    const tipo   = e.inputType || '';
+    const datos  = e.data || '';
+
+    // ── BORRADO ──────────────────────────────────────────────────────
+    const esBorrado = tipo.startsWith('delete') || (!datos && input.value.length < formatoDesdeValorCrudo().length);
+    if (esBorrado) {
+      if (valorCrudo.length > 0) {
+        // Convertir la posición del cursor (antes del borrado) a posición en crudo
+        let posCruda = posFormateadaACruda(cursorAntes);
+        // deleteContentBackward: borra el carácter a la IZQUIERDA del cursor
+        // deleteContentForward:  borra el carácter a la DERECHA del cursor
+        const esHaciaDelante = tipo === 'deleteContentForward';
+        if (esHaciaDelante) {
+          if (posCruda < valorCrudo.length) {
+            valorCrudo = valorCrudo.slice(0, posCruda) + valorCrudo.slice(posCruda + 1);
+          }
+          aplicarFormato(input, posCruda);
+        } else {
+          // Borrar en posCruda - 1 (el carácter a la izquierda)
+          if (posCruda > 0) {
+            valorCrudo = valorCrudo.slice(0, posCruda - 1) + valorCrudo.slice(posCruda);
+          }
+          aplicarFormato(input, Math.max(0, posCruda - 1));
+        }
+      }
+      limpiarResultados();
+      return;
+    }
+
+    // ── INSERCIÓN ────────────────────────────────────────────────────
+    let posCruda = posFormateadaACruda(cursorAntes);
+    for (const c of datos) {
+      const tieneComa = valorCrudo.includes(',');
+      if (c >= '0' && c <= '9') {
+        if (tieneComa) {
+          const dec = valorCrudo.split(',')[1];
+          if (dec.length < 2) {
+            valorCrudo = valorCrudo.slice(0, posCruda) + c + valorCrudo.slice(posCruda);
+            posCruda++;
+          }
+        } else {
+          valorCrudo = valorCrudo.slice(0, posCruda) + c + valorCrudo.slice(posCruda);
+          posCruda++;
+        }
+      } else if ((c === ',' || c === '.') && !tieneComa) {
+        valorCrudo = valorCrudo.slice(0, posCruda) + ',' + valorCrudo.slice(posCruda);
+        posCruda++;
+      }
+    }
+    aplicarFormato(input, posCruda);
+    limpiarResultados();
+  }
+
+  function manejarFocus(e) {
+    const len = e.target.value.length;
+    e.target.setSelectionRange(len, len);
+    limpiarResultados();
+  }
+
+  window.addEventListener('load', function () {
+    const input = document.getElementById('costeFormacion');
+    input.addEventListener('keydown', manejarKeydown);
+    input.addEventListener('input',   manejarInput);
+    input.addEventListener('focus',   manejarFocus);
+  });
+
+  // Exponer para que calcular() pueda leer el valor numérico
+  window.getCosteFormacionNumero = function () {
+    if (!valorCrudo) return 0;
+    return parseFloat(valorCrudo.replace(',', '.')) || 0;
+  };
+
+  // Sincronizar valorCrudo desde un valor formateado externo (ej: tras calcular())
+  // Recibe "1.500,10" y guarda "1500,10"
+  window.sincronizarValorCrudo = function (formateado) {
+    valorCrudo = formateado.replace(/\./g, '');
+  };
+})();
 
 function limpiarResultados() {
   document.getElementById("maximoBonificable").innerText = "";
@@ -809,7 +937,13 @@ function recalcularSiHayResultado() {
 }
 
 function soloNaturales(input) {
-  input.value = input.value.replace(/[^\d]/g, "");
+  const limpio = input.value.replace(/[^\d]/g, "");
+  if (limpio !== input.value) {
+    const cursor = input.selectionStart;
+    const diff = input.value.length - limpio.length;
+    input.value = limpio;
+    input.setSelectionRange(Math.max(0, cursor - diff), Math.max(0, cursor - diff));
+  }
 }
 
 function soloEnteros(event, input) {
@@ -817,7 +951,6 @@ function soloEnteros(event, input) {
   if (event.key === "Enter") { calcular(); return; }
   if (!/^[0-9]$/.test(event.key)) {
     event.preventDefault();
-    mostrarAviso("Solo números sin decimales", "");
   }
 }
 
@@ -850,7 +983,7 @@ function calcular() {
   const horasNoBasicas = !esBasico ? horasPresenciales : 0;
   const horasOnline    = parseFloat(document.getElementById("horasOnline").value)    || 0;
   const alumnos        = parseFloat(document.getElementById("alumnos").value)        || 0;
-  const costeFormacion = parseEuroToNumber(document.getElementById("costeFormacion").value);
+  const costeFormacion = window.getCosteFormacionNumero();
 
   if (!horasPresenciales && !horasOnline) {
     mostrarAviso("Falta la duración:", "Introduce la duración del curso", "horasPresenciales"); return;
@@ -872,15 +1005,17 @@ function calcular() {
     mostrarAviso("Falta el coste:", "Introduce el coste de formación", "costeFormacion"); return;
   }
 
+  // Completar siempre a 2 decimales en el campo de coste y sincronizar valorCrudo
+  const costeFormateado = formatoEuro(costeFormacion); // ej: "1.500,10"
+  document.getElementById("costeFormacion").value = costeFormateado;
+  window.sincronizarValorCrudo(costeFormateado);
+
   const maximoBonificable = (horasBasicas + horasNoBasicas) > (horasOnline / 4)
     ? (horasBasicas * 9 + horasNoBasicas * 13 + horasOnline * 7.5) * alumnos
     : (horasBasicas + horasNoBasicas + horasOnline) * 7.5 * alumnos;
 
   const topePorCostes   = costeFormacion + Math.min(COSTE_GESTION, (costeFormacion + COSTE_GESTION) / 10);
   const aBonificarValue = Math.min(maximoBonificable, topePorCostes);
-
-  const inputCoste = document.getElementById("costeFormacion");
-  if (inputCoste.value) inputCoste.value = formatoEuro(costeFormacion);
 
   document.getElementById("maximoBonificable").innerText = formatoEuro(maximoBonificable) + " €";
   document.getElementById("topePorCostes").innerText     = formatoEuro(topePorCostes)     + " €";
@@ -919,6 +1054,15 @@ window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
 });
+
+function instalarPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById("barraInstalar").style.display = "none";
+  });
+}
 
 function mostrarBannerConAutoOcultar(el) {
   el.style.display = "flex";
@@ -972,12 +1116,6 @@ window.addEventListener("load", () => {
     currentX = 0;
   });
 });
-function instalarPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-  }
-}
 </script>
 </body>
 </html>

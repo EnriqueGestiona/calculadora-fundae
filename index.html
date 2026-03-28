@@ -798,6 +798,7 @@ function formatoEuro(num) {
 
   // Convierte posición en valorCrudo a posición en el string formateado
   function posCrudaAFormateada(posCruda) {
+    if (posCruda === 0) return 0;
     const fmt = formatoDesdeValorCrudo();
     let cuenta = 0;
     for (let i = 0; i < fmt.length; i++) {
@@ -815,13 +816,9 @@ function formatoEuro(num) {
 
   function aplicarFormato(input, posCrudaDeseada) {
     input.value = formatoDesdeValorCrudo();
-    if (posCrudaDeseada !== undefined) {
-      const posFmt = posCrudaAFormateada(posCrudaDeseada);
-      input.setSelectionRange(posFmt, posFmt);
-    } else {
-      const len = input.value.length;
-      input.setSelectionRange(len, len);
-    }
+    const posFmt = posCrudaAFormateada(posCrudaDeseada);
+    input.setSelectionRange(posFmt, posFmt);
+    cursorAntes = posFmt;
   }
 
 
@@ -844,7 +841,7 @@ function formatoEuro(num) {
     const datos  = e.data || '';
 
     // ── BORRADO ──────────────────────────────────────────────────────
-    const esBorrado = tipo.startsWith('delete') || (!datos && input.value.length < formatoDesdeValorCrudo().length);
+    const esBorrado = tipo.startsWith('delete');
     if (esBorrado) {
       if (valorCrudo.length > 0) {
         // Convertir la posición del cursor (antes del borrado) a posición en crudo
@@ -874,13 +871,10 @@ function formatoEuro(num) {
     for (const c of datos) {
       const tieneComa = valorCrudo.includes(',');
       if (c >= '0' && c <= '9') {
-        if (tieneComa) {
-          const dec = valorCrudo.split(',')[1];
-          if (dec.length < 2) {
-            valorCrudo = valorCrudo.slice(0, posCruda) + c + valorCrudo.slice(posCruda);
-            posCruda++;
-          }
-        } else {
+        const posComa = valorCrudo.indexOf(',');
+        const cursorEnDecimal = tieneComa && posCruda > posComa;
+        const decCompleto = cursorEnDecimal && valorCrudo.split(',')[1].length >= 2;
+        if (!decCompleto) {
           valorCrudo = valorCrudo.slice(0, posCruda) + c + valorCrudo.slice(posCruda);
           posCruda++;
         }

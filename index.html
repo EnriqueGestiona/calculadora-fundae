@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#FFA500">
-<meta name="color-scheme" content="light">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Bonificación FUNDAE</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FFA500">
+  <meta name="color-scheme" content="light">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Bonificación FUNDAE</title>
 
-<style>
+  <style>
 :root {
   --navy: #1a1f5e;
   --navy-light: #2a3180;
@@ -21,7 +21,6 @@
   --result-bg: #FFA500;
   --result-border: #FFA500;
   --result-value: #2C36B9;
-  --card-bg: #ffffff;
   --page-bg: #dde1f0;
   --text: #1c1e2e;
   --text-muted: #6b7280;
@@ -174,20 +173,6 @@ button, input { touch-action: manipulation; }
   max-width: 340px;
   margin: 0 auto;
 }
-.steps-row {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 20px;
-}
-.step-dot {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  border: 1.5px solid rgba(255,255,255,0.3);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.9);
-}
 
 /* ── LAYOUT ── */
 .content {
@@ -201,7 +186,7 @@ button, input { touch-action: manipulation; }
 
 /* ── CARDS ── */
 .card {
-  background: var(--card-bg);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px 20px;
@@ -376,22 +361,6 @@ input[type=number] { -moz-appearance: textfield; }
 .card-info {
   background: #f8f9fe;
   border-color: #d4d9f5;
-}
-.gestion-row {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-}
-.gestion-amount {
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--navy);
-}
-.gestion-unit {
-  font-size: 15px;
-  color: var(--text-muted);
-  font-weight: 500;
 }
 
 /* ── CARD RESULTADO ── */
@@ -572,25 +541,23 @@ input[type=number] { -moz-appearance: textfield; }
   input[type="number"], input[type="text"] { font-size: 18px; padding: 10px 6px; }
   .result-value { font-size: 26px; }
 }
-</style>
-<script defer src="https://cloud.umami.is/script.js" data-website-id="3da62b77-f300-4d04-952f-76fe765d91ef"></script>
-<script>
-  // Evento: instalación de la PWA
-  window.addEventListener('appinstalled', () => {
-    if (typeof umami !== 'undefined') {
-      umami.track('pwa_instalada');
-    }
-  });
-
-  // Evento: abre la app desde el icono (ya instalada)
-  window.addEventListener('load', () => {
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+  </style>
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="3da62b77-f300-4d04-952f-76fe765d91ef"></script>
+  <script>
+    window.addEventListener('appinstalled', () => {
       if (typeof umami !== 'undefined') {
-        umami.track('pwa_abierta_desde_icono');
+        umami.track('pwa_instalada');
       }
-    }
-  });
-</script>
+    });
+
+    window.addEventListener('load', () => {
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        if (typeof umami !== 'undefined') {
+          umami.track('pwa_abierta_desde_icono');
+        }
+      }
+    });
+  </script>
 </head>
 <body>
 
@@ -615,7 +582,6 @@ input[type=number] { -moz-appearance: textfield; }
   <div class="header-badge">Calculadora</div>
   <h1>Bonificación FUNDAE</h1>
   <p>Rellena 1-2-3 para saber cuánto puede bonificarse por formación una empresa si le tramitara un curso en FUNDAE</p>
-
 </div>
 
 <div class="content">
@@ -775,18 +741,10 @@ function formatoEuro(num) {
 }
 
 // ── COSTE FORMACIÓN ──────────────────────────────────────────────
-// Estrategia: guardamos el valor "crudo" (sin puntos de miles) en una
-// variable interna y solo usamos el input formateado para mostrar.
-// Así borrar/editar nunca confunde puntos de miles con decimales.
-
 (function () {
-  // valor interno: solo dígitos y como máximo una coma con hasta 2 decimales
-  // ej: "1500", "1500,", "1500,0", "1500,05"
   let valorCrudo = "";
 
-
-  // Convierte posición en el string formateado a posición en valorCrudo
-  // "1.234,56" pos 3 (el '3') → valorCrudo "1234,56" pos 2
+  // Posición en string formateado → posición en valorCrudo
   function posFormateadaACruda(posFmt) {
     const fmt = formatoDesdeValorCrudo();
     let posCruda = 0;
@@ -796,7 +754,7 @@ function formatoEuro(num) {
     return posCruda;
   }
 
-  // Convierte posición en valorCrudo a posición en el string formateado
+  // Posición en valorCrudo → posición en string formateado
   function posCrudaAFormateada(posCruda) {
     if (posCruda === 0) return 0;
     const fmt = formatoDesdeValorCrudo();
@@ -820,9 +778,6 @@ function formatoEuro(num) {
     input.setSelectionRange(posFmt, posFmt);
     cursorAntes = posFmt;
   }
-
-
-  // Capturamos la posición del cursor ANTES de que el navegador modifique el input
   let cursorAntes = 0;
 
   function manejarKeydown(e) {
@@ -831,7 +786,6 @@ function formatoEuro(num) {
       document.getElementById('btnCalcular').focus();
       return;
     }
-    // Guardar posición justo antes del cambio
     cursorAntes = e.target.selectionStart;
   }
 
@@ -840,14 +794,11 @@ function formatoEuro(num) {
     const tipo   = e.inputType || '';
     const datos  = e.data || '';
 
-    // ── BORRADO ──────────────────────────────────────────────────────
+    // ── BORRADO ──
     const esBorrado = tipo.startsWith('delete');
     if (esBorrado) {
       if (valorCrudo.length > 0) {
-        // Convertir la posición del cursor (antes del borrado) a posición en crudo
         let posCruda = posFormateadaACruda(cursorAntes);
-        // deleteContentBackward: borra el carácter a la IZQUIERDA del cursor
-        // deleteContentForward:  borra el carácter a la DERECHA del cursor
         const esHaciaDelante = tipo === 'deleteContentForward';
         if (esHaciaDelante) {
           if (posCruda < valorCrudo.length) {
@@ -855,7 +806,6 @@ function formatoEuro(num) {
           }
           aplicarFormato(input, posCruda);
         } else {
-          // Borrar en posCruda - 1 (el carácter a la izquierda)
           if (posCruda > 0) {
             valorCrudo = valorCrudo.slice(0, posCruda - 1) + valorCrudo.slice(posCruda);
           }
@@ -866,7 +816,7 @@ function formatoEuro(num) {
       return;
     }
 
-    // ── INSERCIÓN ────────────────────────────────────────────────────
+    // ── INSERCIÓN ──
     let posCruda = posFormateadaACruda(cursorAntes);
     for (const c of datos) {
       const tieneComa = valorCrudo.includes(',');
@@ -900,14 +850,12 @@ function formatoEuro(num) {
     input.addEventListener('focus',   manejarFocus);
   });
 
-  // Exponer para que calcular() pueda leer el valor numérico
   window.getCosteFormacionNumero = function () {
     if (!valorCrudo) return 0;
     return parseFloat(valorCrudo.replace(',', '.')) || 0;
   };
 
-  // Sincronizar valorCrudo desde un valor formateado externo (ej: tras calcular())
-  // Recibe "1.500,10" y guarda "1500,10"
+  // Recibe valor formateado ("1.500,10") y sincroniza valorCrudo ("1500,10")
   window.sincronizarValorCrudo = function (formateado) {
     valorCrudo = formateado.replace(/\./g, '');
   };
@@ -998,8 +946,7 @@ function calcular() {
     mostrarAviso("Falta el coste:", "Introduce el coste de formación", "costeFormacion"); return;
   }
 
-  // Completar siempre a 2 decimales en el campo de coste y sincronizar valorCrudo
-  const costeFormateado = formatoEuro(costeFormacion); // ej: "1.500,10"
+  const costeFormateado = formatoEuro(costeFormacion);
   document.getElementById("costeFormacion").value = costeFormateado;
   window.sincronizarValorCrudo(costeFormateado);
 
@@ -1087,24 +1034,36 @@ window.addEventListener("load", () => {
   let startX = 0, currentX = 0, dragging = false;
 
   barra.addEventListener("touchstart", (e) => {
+    barra.classList.remove("barra-animada");
+    barra.style.animation = "none";
     startX   = e.touches[0].clientX;
+    currentX = 0;
     dragging = true;
     barra.style.transition = "none";
-  });
+  }, { passive: true });
   barra.addEventListener("touchmove", (e) => {
     if (!dragging) return;
     currentX = e.touches[0].clientX - startX;
     barra.style.transform = `translateX(${currentX}px)`;
-  });
+    const ratio = Math.min(Math.abs(currentX) / 160, 1);
+    barra.style.opacity = String(1 - ratio * 0.6);
+  }, { passive: true });
   barra.addEventListener("touchend", () => {
     dragging = false;
     if (Math.abs(currentX) > 60) {
-      barra.style.transition = "0.2s";
-      barra.style.transform  = `translateX(${currentX > 0 ? 300 : -300}px)`;
-      setTimeout(() => { barra.style.display = "none"; }, 200);
+      barra.style.transition = "transform 0.22s ease-out, opacity 0.2s ease-out";
+      barra.style.transform  = `translateX(${currentX > 0 ? 110 : -110}vw)`;
+      barra.style.opacity    = "0";
+      setTimeout(() => {
+        barra.style.display    = "none";
+        barra.style.transform  = "translateX(0)";
+        barra.style.opacity    = "1";
+        barra.style.transition = "";
+      }, 230);
     } else {
-      barra.style.transition = "0.2s";
+      barra.style.transition = "transform 0.3s cubic-bezier(.22,.68,0,1.4), opacity 0.3s ease";
       barra.style.transform  = "translateX(0)";
+      barra.style.opacity    = "1";
     }
     currentX = 0;
   });
